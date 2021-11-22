@@ -2,7 +2,7 @@ import cartolafc
 import mysql.connector
 
 
-class Acesso:
+class BD:
     def __init__(self):
         self.database = "roleta_russa_2022"
 
@@ -46,6 +46,11 @@ class Acesso:
         cursor.execute(f'UPDATE autenticacao SET cookie={nova_autenticacao}')
         con.commit()
 
+
+class Api:
+    def __init__(self):
+        self.api = self.api_login()
+
     def api_login(self):
         """
                 Acessa o API do Cartola FC.
@@ -53,13 +58,65 @@ class Acesso:
                 Retorna:    api - Instancia da classe API da biblioteca cartolafc.
         """
         api = cartolafc.Api()
+        bd = BD()
         while True:
             try:
-                api._glb_id = self.cookie_autenticacao()
+                api._glb_id = bd.cookie_autenticacao()
                 api.ligas(query='')
             except:
                 print("Erro de login.")
-                self.trocar_cookie()
+                bd.trocar_cookie()
             else:
                 break
         return api
+
+    def pesquisar_time(self):
+        """
+                Pesquisa por um time na API do CArtola FC.
+
+                Recebe:     termo_pesquisa(opcional) - termo que será utilizado para efetuar a pesquisa.
+
+                Retorna:    lista_times - uma lista de dicionários contendo os dados dos times escontrados ou
+                                            uma lista vazia caso o usuário desista de pesquisar.
+        """
+        lista_times = []
+        while True:
+            termo_pesquisa = str(input('Digite o nome do Time: ')).strip()
+            times = self.api.times(query=termo_pesquisa)
+            if times:
+                break
+            else:
+                continuar = str(input('Time não encontrado. Gostaria de tentar novamente?[S/N] ')).strip().upper()
+                if continuar == "N":
+                    print("Nenhum time selecionado.")
+                    return []
+        for item in times:
+            temp = {"id": item.id, "nome": item.nome, "cartoleiro": item.nome_cartola}
+            lista_times.append(temp)
+        return lista_times
+
+    def pesquisar_liga(self):
+        """
+        Pesquisa por uma liga na API do CArtola FC.
+
+        Recebe:     termo_pesquisa(opcional) - termo que será utilizado para efetuar a pesquisa.
+
+        Retorna:    lista_ligas - uma lista de dicionários contendo os dados das ligas encontradas ou
+                                    uma lista vazia caso o usuário desista da procura.
+        """
+        lista_ligas = []
+        while True:
+            termo_pesquisa = str(input('Digite o nome da Liga: ')).strip()
+            ligas = self.api.ligas(query=termo_pesquisa)
+            if ligas:
+                break
+            else:
+                continuar = str(input('Liga não encontrado. Gostaria de tentar novamente?[S/N] ')).strip().upper()
+                if continuar == "N":
+                    print("Nenhuma Liga selecionada.")
+                    return []
+        for item in ligas:
+            temp = {"nome": item.nome, "slug": item.slug}
+            lista_ligas.append(temp)
+        return lista_ligas
+
