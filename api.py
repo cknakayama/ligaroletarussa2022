@@ -1,57 +1,13 @@
 import cartolafc
-import mysql.connector
-
-
-class BD:
-    def __init__(self):
-        self.database = "roleta_russa_2022"
-
-    def acesso_mysql(self):
-        """
-                Acessa o Banco de Dados.
-
-                Retorna:    con - Conecção do Banco de Dados.
-                            cursor - Método para utilizar instruções do Banco de Dados.
-        """
-        con = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="",
-            database=self.database
-        )
-        cursor = con.cursor()
-        return con, cursor
-
-    def cookie_autenticacao(self):
-        """
-                Acessa o Banco de Dados e pega o 'código de autorização'.
-
-                Retorna:    cookie - string com o código.
-        """
-        con, cursor = self.acesso_mysql()
-        cursor.execute("SELECT * FROM autenticacao")
-        cookie = cursor.fetchall()
-        return cookie[0][0]
-
-    def trocar_cookie(self):
-        """
-                Caso o código de autenticação não funcione, este método auxilia na troca do código.
-
-                Para pegar o código, acesse o site do Cartola FC pelo navegador e faça o login.
-                Após o login, acesse a página https://login.globo.com/api/user e copie o código apresentado
-                na variável glbId.
-        """
-        nova_autenticacao = str(input('Digite a nova autenticação: '))
-        con, cursor = self.acesso_mysql()
-        cursor.execute(f'UPDATE autenticacao SET cookie={nova_autenticacao}')
-        con.commit()
+from bd import BD
 
 
 class Api:
     def __init__(self):
         self.api = self.api_login()
 
-    def api_login(self):
+    @staticmethod
+    def api_login():
         """
                 Acessa o API do Cartola FC.
 
@@ -62,8 +18,8 @@ class Api:
         while True:
             try:
                 api._glb_id = bd.cookie_autenticacao()
-                api.ligas(query='')
-            except:
+                api.liga(slug='')
+            except cartolafc.CartolaFCError:
                 print("Erro de login.")
                 bd.trocar_cookie()
             else:
@@ -88,7 +44,7 @@ class Api:
             else:
                 continuar = str(input('Time não encontrado. Gostaria de tentar novamente?[S/N] ')).strip().upper()
                 if continuar == "N":
-                    print("Nenhum time selecionado.")
+                    print("Nenhum time encontrado. Usuário CANCELOU a pesquisa.")
                     return []
         for item in times:
             temp = {"id": item.id, "nome": item.nome, "cartoleiro": item.nome_cartola}
@@ -113,10 +69,30 @@ class Api:
             else:
                 continuar = str(input('Liga não encontrado. Gostaria de tentar novamente?[S/N] ')).strip().upper()
                 if continuar == "N":
-                    print("Nenhuma Liga selecionada.")
+                    print("Nenhuma Liga encontrada. Usuário CANCELOU a pesquisa.")
                     return []
         for item in ligas:
             temp = {"nome": item.nome, "slug": item.slug}
             lista_ligas.append(temp)
         return lista_ligas
 
+    def atualizar_nomes(self, tabela):
+        pass
+        """api = self.acesso_autenticado()
+        con, cursor = self.acessar_banco_de_dados()
+        while True:
+            try:
+                cursor.execute(f"SELECT ID, Nome, Cartoleiro FROM {tabela}")
+            except OperationalError:
+                print(f'Tabela {tabela} ou Colunas ID, Nome e Cartoleiro inexistentes.')
+                continue
+            else:
+                times = cursor.fetchall()
+                break
+        for t in times:
+            id = t[0]
+            time = api.time(id=id, as_json=True)
+            atual = {'nome': time['time']['nome'], 'cartoleiro': time['time']['nome_cartola']}
+            cursor.execute(
+                f'UPDATE {tabela} SET Nome="{atual["nome"]}", Cartoleiro="{atual["cartoleiro"]}" WHERE ID={id}')
+            con.commit()"""
