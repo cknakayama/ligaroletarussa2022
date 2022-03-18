@@ -1,9 +1,12 @@
-from bd import nomes_colunas, bd_dict
-from api import times_liga
+from bd import *
+from api import *
 
 
-x = times_liga("roleta-ru-a")
-y = x[0].keys()
-for i in y:
-    print(i)
+#con, cursor = acesso_mysql()
+#cursor.execute("SELECT ID FROM mmliga")
+#print(cursor.fetchall())
 
+x = pesquisar_time()
+salvar_time_bd(x, "mmliga")
+atualizar_nomes_times("mmliga")
+print(x)

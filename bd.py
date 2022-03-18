@@ -6,14 +6,14 @@ Funcionalidades que acessam o Bando de Dados.
 import mysql.connector
 
 
-database = "roleta_russa_2022"
+database = "rr2022"
 
 
 def acesso_mysql():
     """
             Acessa o Banco de Dados.
 
-            Retorna:    con - Conecção do Banco de Dados.
+            Retorna:    con - Conexão do Banco de Dados.
                         cursor - Método para utilizar instruções do Banco de Dados.
     """
     con = mysql.connector.connect(
@@ -26,7 +26,7 @@ def acesso_mysql():
     return con, cursor
 
 
-def cookie_autenticacao():
+def pegar_autenticacao():
     """
             Acessa o Banco de Dados e pega o 'código de autorização'.
 
@@ -52,21 +52,25 @@ def trocar_cookie():
     con.commit()
 
 
-def nomes_colunas(tabela:str):
+def nomes_colunas(tabela: str):
     """
             Acessa o Banco de Dados e pega os nomes das colunas da tabela especificada.'.
 
-            Retorna:    lista de tuplas com os nomes das colunas.
+            Retorna:    lista com os nomes das colunas.
     """
     con, cursor = acesso_mysql()
     cursor.execute(f"""SELECT `COLUMN_NAME` 
                     FROM `INFORMATION_SCHEMA`.`COLUMNS` 
-                    WHERE `TABLE_SCHEMA`='roleta_russa_2022' 
+                    WHERE `TABLE_SCHEMA`='{database}' 
                     AND `TABLE_NAME`='{tabela}';""")
-    return cursor.fetchall()
+    colunas = []
+    temp = cursor.fetchall()
+    for coluna in temp:
+        colunas.append(coluna[0])
+    return colunas
 
 
-def bd_dict_list(tabela:str):
+def bd_dict_list(tabela: str):
     """
             Pega os dados de cada linha da tabela especificada e transforma em dicionários.
 
@@ -80,16 +84,56 @@ def bd_dict_list(tabela:str):
         dicionario_temp = {}
         contador = 0
         for coluna in colunas:
-            dicionario_temp[f"{coluna[0]}"] = linha[contador]
+            dicionario_temp[coluna] = linha[contador]
             contador += 1
         lista_dados.append(dicionario_temp)
     return lista_dados
 
 
-def dict_list_bd(lista:list, tabela:str):
+def salvar_time_bd(time: dict, tabela: str):
+    """
+    Salva o time na tabela especificada.
+
+    """
+    valores = (time['ID'], time['Nome'], time['Cartoleiro'])
     con, cursor = acesso_mysql()
-    if not tabela:
-        print("Tabela não informada!")
-        nome_tabela = str(input("Digite o nome da nova tabela que será criada: "))
+    try:
+        cursor.execute(f"""INSERT INTO {tabela}(ID, Nome, Cartoleiro)
+                        VALUES{valores};""")
+        con.commit()
+    except mysql.connector.errors.IntegrityError:
+        print(f"Já existe cadastro do time com ID {time['ID']}")
+    else:
+        print("Time salvo")
 
 
+def atualizar_pontuacao_rodada(id_time: int, rodada: int, pontos: float, tabela: str):
+    """
+    Salva a pontuação da Rodada especificada no time especificado.
+    """
+    coluna = f'Rodada{rodada}'
+    colunas_atuais = nomes_colunas(tabela)
+    con, cursor = acesso_mysql()
+    if coluna not in colunas_atuais:
+        cursor.execute(f"ALTER TABLE {tabela} ADD {coluna} double;")
+        con.commit()
+        print(f"Coluna {coluna} criada com sucesso.")
+    else:
+        print(f"Coluna {coluna} já existe.")
+    cursor.execute(f"UPDATE {tabela} SET {coluna}={pontos} WHERE ID={id_time};")
+    con.commit()
+    print("Pontuação salva com sucesso.")
+
+
+def pegar_id_times(tabela: str):
+    """
+    Pega os IDs da tabela especificada.
+    Retorna uma lista com os Ids.
+    """
+    con, cursor = acesso_mysql()
+    cursor.execute(f"SELECT ID FROM {tabela}")
+    ids = []
+    temp = cursor.fetchall()
+    for i in temp:
+        ids.append(i[0])
+    return ids

@@ -56,7 +56,7 @@ def int_input(texto: str = ''):
     return entrada
 
 
-def escolher_entre_opcoes(self, dicionario: list):
+def escolher_entre_opcoes(dicionario: list):
     """"
     Método que devolve a opção escolhida.
 
@@ -65,7 +65,7 @@ def escolher_entre_opcoes(self, dicionario: list):
     Retorna:    dicionário com a opção escolhida ou um dicionário vazio.
     """
     while True:
-        escolha = self.int_input(
+        escolha = int_input(
             f'Escolha uma das opções entre 1 e {len(dicionario)} ou 0 e digite aqui sua escolha: ')
         if escolha == 0:
             return {}

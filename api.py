@@ -3,7 +3,10 @@ Funcionalidades que acessam a APi do CartolaFC.
 """
 
 import cartolafc
+from mysqlx import OperationalError
+
 from bd import *
+from exibir_console import *
 
 
 def api_login():
@@ -15,7 +18,7 @@ def api_login():
     api = cartolafc.Api()
     while True:
         try:
-            api._glb_id = cookie_autenticacao()
+            api._glb_id = pegar_autenticacao()
             api.liga(slug='roleta-ru-a')
         except cartolafc.CartolaFCError:
             print("Erro de login.")
@@ -24,12 +27,12 @@ def api_login():
             break
     return api
 
+
 def pesquisar_time():
     """
             Pesquisa por um time na API do CArtola FC.
 
-            Retorna:    lista_times - uma lista de dicionários contendo os dados dos times escontrados ou
-                                        uma lista vazia caso o usuário desista de pesquisar.
+            Retorna:    Dicionário com os dados do time escolhido
     """
     api = api_login()
     lista_times = []
@@ -44,16 +47,17 @@ def pesquisar_time():
                 print("Nenhum time encontrado. Usuário CANCELOU a pesquisa.")
                 return []
     for item in times:
-        temp = {"id": item.id, "nome": item.nome, "cartoleiro": item.nome_cartola}
+        temp = {"ID": item.id, "Nome": item.nome, "Cartoleiro": item.nome_cartola}
         lista_times.append(temp)
-    return lista_times
+    listar_itens(lista_times)
+    return escolher_entre_opcoes(lista_times)
+
 
 def pesquisar_liga():
     """
     Pesquisa por uma liga na API do CArtola FC.
 
-    Retorna:    lista_ligas - uma lista de dicionários contendo os dados das ligas encontradas ou
-                                uma lista vazia caso o usuário desista da procura.
+    Retorna:    Dicionário com os dados da Liga
     """
     api = api_login()
     lista_ligas = []
@@ -68,35 +72,34 @@ def pesquisar_liga():
                 print("Nenhuma Liga encontrada. Usuário CANCELOU a pesquisa.")
                 return []
     for item in ligas:
-        temp = {"nome": item.nome, "slug": item.slug}
+        temp = {"Nome": item.nome, "Slug": item.slug}
         lista_ligas.append(temp)
-    return lista_ligas
-
-def atualizar_nomes(tabela):
-    pass
-    """api = self.acesso_autenticado()
-    con, cursor = self.acessar_banco_de_dados()
-    while True:
-        try:
-            cursor.execute(f"SELECT ID, Nome, Cartoleiro FROM {tabela}")
-        except OperationalError:
-            print(f'Tabela {tabela} ou Colunas ID, Nome e Cartoleiro inexistentes.')
-            continue
-        else:
-            times = cursor.fetchall()
-            break
-    for t in times:
-        id = t[0]
-        time = api.time(id=id, as_json=True)
-        atual = {'nome': time['time']['nome'], 'cartoleiro': time['time']['nome_cartola']}
-        cursor.execute(
-            f'UPDATE {tabela} SET Nome="{atual["nome"]}", Cartoleiro="{atual["cartoleiro"]}" WHERE ID={id}')
-        con.commit()"""
+    listar_itens(lista_ligas)
+    return escolher_entre_opcoes(lista_ligas)
 
 
-def times_liga(slug:str):
+def atualizar_nomes_times(tabela: str):
+    api = api_login()
+    con, cursor = acesso_mysql()
+    try:
+        cursor.execute(f"SELECT ID FROM {tabela};")
+        times = cursor.fetchall()
+        for t in times:
+            id_time = t[0]
+            time = api.time(id=id_time, as_json=True)
+            atual = {'nome': time['time']['nome'], 'cartoleiro': time['time']['nome_cartola']}
+            cursor.execute(
+                f'UPDATE {tabela} SET Nome="{atual["nome"]}", Cartoleiro="{atual["cartoleiro"]}" WHERE ID={id_time};')
+            con.commit()
+    except OperationalError:
+        print(f'Tabela {tabela} ou Colunas ID, Nome e Cartoleiro inexistentes.')
+    except cartolafc.errors.CartolaFCError:
+        print("Time ainda não foi escalado na temporada.")
+
+
+def times_liga(slug: str):
     """
-        Pega todosos times da liga especificada.
+        Pega todos os times da liga especificada.
 
         Retorna:    lista com os times da liga.
     """
@@ -104,6 +107,6 @@ def times_liga(slug:str):
     times = api.liga(slug=slug).times
     lista_times = []
     for time in times:
-        dicionario = {"id": time.id, "nome": time.nome, "cartoleiro": time.nome_cartola}
+        dicionario = {"ID": time.id, "Nome": time.nome, "Cartoleiro": time.nome_cartola}
         lista_times.append(dicionario)
     return lista_times
