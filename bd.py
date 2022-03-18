@@ -122,7 +122,29 @@ def atualizar_pontuacao_rodada(id_time: int, rodada: int, pontos: float, tabela:
         print(f"Coluna {coluna} já existe.")
     cursor.execute(f"UPDATE {tabela} SET {coluna}={pontos} WHERE ID={id_time};")
     con.commit()
-    print("Pontuação salva com sucesso.")
+
+
+def atualizar_patrimonio(id_time: int, patrimonio: float, tabela: str):
+    """
+    Salva o patrimonio do time especificado.
+    """
+    coluna = 'Patrimonio'
+    con, cursor = acesso_mysql()
+    cursor.execute(f"UPDATE {tabela} SET {coluna}={patrimonio} WHERE ID={id_time};")
+    con.commit()
+
+def atualizar_pts_total(id_time: int, pts_rodada: float, tabela: str):
+    """
+    Salva o patrimonio do time especificado.
+    """
+    coluna = 'Pts_total'
+    con, cursor = acesso_mysql()
+    cursor.execute(f"SELECT {coluna} FROM {tabela} WHERE ID={id_time};")
+    pts_anterior = cursor.fetchall()
+
+    cursor.execute(f"UPDATE {tabela} SET {coluna}={patrimonio} WHERE ID={id_time};")
+    con.commit()
+
 
 
 def pegar_id_times(tabela: str):

@@ -1,12 +1,13 @@
 """
 Funcionalidades que acessam a APi do CartolaFC.
 """
+from json import JSONDecodeError
 
 import cartolafc
 from mysqlx import OperationalError
-
 from bd import *
 from exibir_console import *
+import requests
 
 
 def api_login():
@@ -26,6 +27,23 @@ def api_login():
         else:
             break
     return api
+
+
+def rodada():
+    """
+    Pega o número da rodada atual.
+
+    Retorna:    status['rodada_atual'] - inteiro representando a rodada atual.
+    """
+    try:
+        url_1 = 'https://api.cartolafc.globo.com/mercado/status'
+        r = requests.get(url=url_1)
+        status = r.json()
+    except:
+        print('Não foi possível pegar a rodada no sistema.')
+        return int_input('Digite a rodada:')
+    else:
+        return status['rodada_atual']
 
 
 def pesquisar_time():
@@ -110,3 +128,23 @@ def times_liga(slug: str):
         dicionario = {"ID": time.id, "Nome": time.nome, "Cartoleiro": time.nome_cartola}
         lista_times.append(dicionario)
     return lista_times
+
+
+def pegar_pontuacao_cc(id_time: int):
+    api = api_login()
+    try:
+        t = api.time(id=id_time, as_json=True)
+    except cartolafc.CartolaFCError:
+        t = {'pontos': 0, 'patrimonio': 0}
+    return {'ID': id_time, 'Pontos': t['pontos'], 'Patrimonio': t['patrimonio']}
+
+
+def pegar_pontuacao_sc(id_time: int):
+    api = api_login()
+    time = api.time(id=id_time, as_json=True)
+    pontos = 0
+    for jogadores in time['atletas']:
+        pontos += jogadores['pontos_num']
+    return {'ID': id_time, 'Pontos': pontos, 'Patrimonio': time['patrimonio']}
+
+
