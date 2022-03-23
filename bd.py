@@ -107,6 +107,20 @@ def salvar_time_bd(time: dict, tabela: str):
         print("Time salvo")
 
 
+def pegar_id_times(tabela: str):
+    """
+    Pega os IDs da tabela especificada.
+    Retorna uma lista com os Ids.
+    """
+    con, cursor = acesso_mysql()
+    cursor.execute(f"SELECT ID FROM {tabela}")
+    ids = []
+    temp = cursor.fetchall()
+    for i in temp:
+        ids.append(i[0])
+    return ids
+
+
 def atualizar_pontuacao_rodada(id_time: int, rodada: int, pontos: float, tabela: str):
     """
     Salva a pontuação da Rodada especificada no time especificado.
@@ -133,29 +147,55 @@ def atualizar_patrimonio(id_time: int, patrimonio: float, tabela: str):
     cursor.execute(f"UPDATE {tabela} SET {coluna}={patrimonio} WHERE ID={id_time};")
     con.commit()
 
+
 def atualizar_pts_total(id_time: int, pts_rodada: float, tabela: str):
     """
-    Salva o patrimonio do time especificado.
+    Salva a pontuação total do time especificado.
     """
     coluna = 'Pts_total'
     con, cursor = acesso_mysql()
     cursor.execute(f"SELECT {coluna} FROM {tabela} WHERE ID={id_time};")
-    pts_anterior = cursor.fetchall()
-
-    cursor.execute(f"UPDATE {tabela} SET {coluna}={patrimonio} WHERE ID={id_time};")
+    pts_anterior = cursor.fetchall()[0][0]
+    pts_atual = pts_anterior + pts_rodada
+    cursor.execute(f"UPDATE {tabela} SET {coluna}={pts_atual} WHERE ID={id_time};")
     con.commit()
 
 
-
-def pegar_id_times(tabela: str):
+def atualizar_turno_returno(id_time: int, rodada_atual: int, pts_rodada: float, tabela: str):
     """
-    Pega os IDs da tabela especificada.
-    Retorna uma lista com os Ids.
+        Salva a pontuação de turno ou returno do time especificado.
     """
+    if rodada_atual <= 19:
+        coluna = 'Turno'
+    else:
+        coluna = 'Returno'
     con, cursor = acesso_mysql()
-    cursor.execute(f"SELECT ID FROM {tabela}")
-    ids = []
-    temp = cursor.fetchall()
-    for i in temp:
-        ids.append(i[0])
-    return ids
+    cursor.execute(f"SELECT {coluna} FROM {tabela} WHERE ID={id_time};")
+    pts_anterior = cursor.fetchall()[0][0]
+    pts_atual = pts_anterior + pts_rodada
+    cursor.execute(f"UPDATE {tabela} SET {coluna}={pts_atual} WHERE ID={id_time};")
+    con.commit()
+
+
+def atualizar_mito(id_time: int, rodada_atual: int, pts_rodada: float, tabela: str):
+    """
+    Atualiza a melhor pontuação(Mito) do time especificado.
+    """
+    coluna1 = 'Mito'
+    coluna2 = 'Mito_rodada'
+    con, cursor = acesso_mysql()
+    cursor.execute(f"SELECT {coluna1} FROM {tabela} WHERE ID={id_time};")
+    pts_anterior = cursor.fetchall()[0][0]
+    if pts_rodada > pts_anterior:
+        cursor.execute(f"UPDATE {tabela} SET {coluna1}={pts_rodada}, {coluna2}={rodada_atual} WHERE ID={id_time};")
+        con.commit()
+
+
+def atualizar_pontuacao_eliminatoria(id_time: int, pontos: float, tabela: str):
+    """
+    Salva a pontuação da Rodada no time especificado.
+    """
+    coluna = "Pts"
+    con, cursor = acesso_mysql()
+    cursor.execute(f"UPDATE {tabela} SET {coluna}={pontos} WHERE ID={id_time};")
+    con.commit()
