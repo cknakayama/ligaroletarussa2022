@@ -4,6 +4,7 @@ Funcionalidades que acessam o Bando de Dados.
 
 
 import mysql.connector
+from exibir_console import *
 
 
 database = "rr2022"
@@ -70,16 +71,26 @@ def nomes_colunas(tabela: str):
     return colunas
 
 
-def bd_dict_list(tabela: str):
+def bd_dict_list(tabela: str, coluna: str):
     """
             Pega os dados de cada linha da tabela especificada e transforma em dicionários.
 
             Retorna:    lista de dicionarios.
     """
+    lista_colunas = []
+    colunas = nomes_colunas(tabela)
+    if coluna not in colunas:
+        for c in colunas:
+            lista_colunas.append({f"Coluna": c})
+        exibir_cabecalho("Escolha como deseja ordenar os dados:")
+        listar_itens(lista_colunas)
+        escolha = escolher_entre_opcoes(lista_colunas)
+        coluna_ordem = escolha["Coluna"]
+    else:
+        coluna_ordem = coluna
     lista_dados = []
     con, cursor = acesso_mysql()
-    colunas = nomes_colunas(tabela)
-    cursor.execute(f"SELECT * FROM {tabela}")
+    cursor.execute(f"SELECT * FROM {tabela} ORDER BY {coluna_ordem} DESC;")
     for linha in cursor.fetchall():
         dicionario_temp = {}
         contador = 0

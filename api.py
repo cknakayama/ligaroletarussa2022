@@ -55,20 +55,29 @@ def pesquisar_time():
     api = api_login()
     lista_times = []
     while True:
-        termo_pesquisa = str(input('Digite o nome do Time: ')).strip()
-        times = api.times(query=termo_pesquisa)
-        if times:
+        while True:
+            termo_pesquisa = str(input('Digite o nome do Time: ')).strip()
+            times = api.times(query=termo_pesquisa)
+            if times:
+                break
+            else:
+                continuar = str(input('Time não encontrado. Gostaria de tentar novamente?[S/N] ')).strip().upper()
+                if continuar == "N":
+                    print("Nenhum time encontrado. Usuário CANCELOU a pesquisa.")
+                    return {}
+        for item in times:
+            temp = {"ID": item.id, "Nome": item.nome, "Cartoleiro": item.nome_cartola}
+            lista_times.append(temp)
+        listar_itens(lista_times)
+        escolha = escolher_entre_opcoes(lista_times)
+        if escolha:
             break
         else:
-            continuar = str(input('Time não encontrado. Gostaria de tentar novamente?[S/N] ')).strip().upper()
+            continuar = str(input('Gostaria de tentar novamente?[S/N] ')).strip().upper()
             if continuar == "N":
-                print("Nenhum time encontrado. Usuário CANCELOU a pesquisa.")
-                return []
-    for item in times:
-        temp = {"ID": item.id, "Nome": item.nome, "Cartoleiro": item.nome_cartola}
-        lista_times.append(temp)
-    listar_itens(lista_times)
-    return escolher_entre_opcoes(lista_times)
+                print("Usuário CANCELOU a pesquisa.")
+                return {}
+    return escolha
 
 
 def pesquisar_liga():
@@ -146,5 +155,3 @@ def pegar_pontuacao_sc(id_time: int):
     for jogadores in time['atletas']:
         pontos += jogadores['pontos_num']
     return {'ID': id_time, 'Pontos': pontos, 'Patrimonio': time['patrimonio']}
-
-

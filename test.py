@@ -1,16 +1,8 @@
 from bd import *
 from api import *
+from main import *
 
 
-con, cursor = acesso_mysql()
-cursor.execute("SELECT Rodada1 FROM mmliga")
-print(cursor.fetchall())
-
-x = bd_dict_list("mmliga")
-#x = bd_dict_list("mmliga")
-print(x)
-
-x = None
-y = 100
-if y > x:
-    print("SIM")
+for mes in range(4, 12):
+    inicio = 6+((mes - 4) * 4)
+    print(inicio)
