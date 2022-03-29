@@ -2,7 +2,7 @@
 Funcionalidades para atualizar os informativos
 """
 import openpyxl
-from bd import bd_dict_list
+from bd import *
 from api import rodada
 
 

@@ -2,6 +2,7 @@
 Funções para exibir e interagir com algo no console.
 """
 from os import system
+from interface import sair
 
 
 def exibir_cabecalho(texto: str = ''):
@@ -62,7 +63,7 @@ def escolher_entre_opcoes(dicionario: list):
 
     Recebe:     dicionario - lista de dicionários com as opções.
 
-    Retorna:    dicionário com a opção escolhida ou um dicionário vazio.
+    Retorna:    dicionário com a opção escolhida ou um dicionario vazio..
     """
     while True:
         escolha = int_input(
@@ -70,6 +71,48 @@ def escolher_entre_opcoes(dicionario: list):
         if escolha == 0:
             return {}
         elif 0 < escolha <= len(dicionario):
-            return dicionario[escolha - 1]
+            try:
+                opcao = dicionario[escolha -1]
+            except IndexError:
+                print('Opção inválida.')
+            else:
+                return opcao
         else:
             print('Opção inválida.')
+
+
+def escolher_varias_opcoes(lista: list):
+    """"
+    Método que devolve a opção ou opções escolhidas.
+
+    Recebe:     lista - lista de dicionários com as opções.
+
+    Retorna:    lista - lista de dicionários com as opções escolhidas.
+    """
+    while True:
+        entrada = list(input(f'Escolha uma ou mais opções entre 1 e {len(lista)} ou 0 e digite aqui sua escolha: '))
+        if len(entrada) == 1 and entrada[0] == 0:
+            return {}
+        else:
+            escolhas = []
+            for item in entrada:
+                try:
+                    num = int(item)
+                except ValueError:
+                    pass
+                else:
+                    try:
+                        opcao = lista[num - 1]
+                    except IndexError:
+                        pass
+                    else:
+                        escolhas.append(opcao)
+            if not escolhas:
+                print("Digite pelo menos uma opção válida.")
+            else:
+                exibir_cabecalho("Opções escolhidas")
+                listar_itens(escolhas)
+                continuar = str(input("Confirma?[S/N] ")).strip().upper()
+                if continuar == "S":
+                    return escolhas
+

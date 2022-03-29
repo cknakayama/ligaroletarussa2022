@@ -1,8 +1,7 @@
 from bd import *
 from api import *
-from main import *
+from roleta_russa import *
+from interface import *
 
 
-for mes in range(4, 12):
-    inicio = 6+((mes - 4) * 4)
-    print(inicio)
+cadastrar_time()

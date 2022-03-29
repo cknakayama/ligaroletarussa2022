@@ -113,9 +113,9 @@ def salvar_time_bd(time: dict, tabela: str):
                         VALUES{valores};""")
         con.commit()
     except mysql.connector.errors.IntegrityError:
-        print(f"Já existe cadastro do time com ID {time['ID']}")
+        print(f"Já existe cadastro do time {time['Nome']} com ID {time['ID']}")
     else:
-        print("Time salvo")
+        print(f"Time {time['Nome']} salvo.")
 
 
 def pegar_id_times(tabela: str):
@@ -200,6 +200,31 @@ def atualizar_mito(id_time: int, rodada_atual: int, pts_rodada: float, tabela: s
     if pts_rodada > pts_anterior:
         cursor.execute(f"UPDATE {tabela} SET {coluna1}={pts_rodada}, {coluna2}={rodada_atual} WHERE ID={id_time};")
         con.commit()
+
+
+def atualizar_mensal(tabela: str, rodada_atual: int):
+    con, cursor = acesso_mysql()
+    while True:
+        print(f"Tabela: {tabela}")
+        terminou_mes = str(input("Terminou o mês?[S/N] ")).strip().upper()
+        if terminou_mes == "N":
+            break
+        elif terminou_mes == "S":
+            apagar_mes = str(input("A pontuação mensal será zerada. Confirma?[S/N] ")).strip().upper()
+            if apagar_mes == "S":
+                cursor.execute(f"UPDATE {tabela} SET Mensal = 0;")
+                con.commit()
+                break
+        else:
+            print("Opção Inválida!")
+    cursor.execute(f"SELECT ID, Mensal, Rodada{rodada_atual} FROM {tabela}")
+    pontuacoes = cursor.fetchall()
+    for time in pontuacoes:
+        id = time[0]
+        mensal = time[1] + time[2]
+        cursor.execute(f"UPDATE {tabela} SET Mensal = {mensal} WHERE ID = {id};")
+        con.commit()
+    print(f"Pontuações Mensais da tabela {tabela} atualizadas.")
 
 
 def atualizar_pontuacao_eliminatoria(id_time: int, pontos: float, tabela: str):

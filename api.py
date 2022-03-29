@@ -50,7 +50,7 @@ def pesquisar_time():
     """
             Pesquisa por um time na API do CArtola FC.
 
-            Retorna:    Dicionário com os dados do time escolhido
+            Retorna:    Dicionário com os dados do time escolhido ou dicionario vazio.
     """
     api = api_login()
     lista_times = []
@@ -97,7 +97,7 @@ def pesquisar_liga():
             continuar = str(input('Liga não encontrado. Gostaria de tentar novamente?[S/N] ')).strip().upper()
             if continuar == "N":
                 print("Nenhuma Liga encontrada. Usuário CANCELOU a pesquisa.")
-                return []
+                sair()
     for item in ligas:
         temp = {"Nome": item.nome, "Slug": item.slug}
         lista_ligas.append(temp)
@@ -122,6 +122,8 @@ def atualizar_nomes_times(tabela: str):
         print(f'Tabela {tabela} ou Colunas ID, Nome e Cartoleiro inexistentes.')
     except cartolafc.errors.CartolaFCError:
         print("Time ainda não foi escalado na temporada.")
+    else:
+        print(f"Nomes dos times da tabela {tabela} foram atualizados.")
 
 
 def times_liga(slug: str):

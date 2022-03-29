@@ -3,63 +3,87 @@ Programa Principal
 """
 from bd import *
 from api import *
-from informativos import acessar_arquivo
+from informativos import *
 from exibir_console import *
 from random import randint
 
 
-class PontosPrincipal:
+class Principal:
     def __init__(self):
         self.rodada = rodada() - 1
         tabelas = ["lprincipal_ccap", "lprincipal_scap"]
-        atualizar_nomes_times(tabelas[0])
-        self.atualizar_pontos_cc(tabelas[0])
-        atualizar_nomes_times(tabelas[1])
-        self.atualizar_pontos_sc(tabelas[1])
+        for tabela in tabelas:
+            atualizar_nomes_times(tabela)
+            self.atualizar_pontos(tabela)
+            print(f"Tabela {tabela} atualizada com a rodada {self.rodada}.")
 
-    def atualizar_pontos_cc(self, tabela: str):
+    def atualizar_pontos(self, tabela: str):
         lista_times = pegar_id_times(tabela)
         for time in lista_times:
-            dados = pegar_pontuacao_cc(time)
+            if tabela == "lprincipal_ccap":
+                dados = pegar_pontuacao_cc(time)
+            else:
+                dados = pegar_pontuacao_sc(time)
             atualizar_pontuacao_rodada(time, self.rodada, dados["Pontos"], tabela)
             atualizar_patrimonio(time, dados["Patrimonio"], tabela)
             atualizar_pts_total(time, dados["Pontos"], tabela)
             atualizar_mito(time, self.rodada, dados["Pontos"], tabela)
             atualizar_turno_returno(time, self.rodada, dados["Pontos"], tabela)
-
-    def atualizar_pontos_sc(self, tabela: str):
-        lista_times = pegar_id_times(tabela)
-        for time in lista_times:
-            dados = pegar_pontuacao_sc(time)
-            atualizar_pontuacao_rodada(time, self.rodada, dados["Pontos"], tabela)
-            atualizar_patrimonio(time, dados["Patrimonio"], tabela)
-            atualizar_pts_total(time, dados["Pontos"], tabela)
-            atualizar_mito(time, self.rodada, dados["Pontos"], tabela)
-            atualizar_turno_returno(time, self.rodada, dados["Pontos"], tabela)
+        atualizar_mensal(tabela, self.rodada)
 
 
-class PontosEliminatoria:
+class Eliminatoria:
     def __init__(self):
         self.rodada = rodada() - 1
         tabelas = ["leliminatoria_ccap", "leliminatoria_scap"]
-        atualizar_nomes_times(tabelas[0])
-        self.atualizar_pontos_cc(tabelas[0])
-        atualizar_nomes_times(tabelas[1])
-        self.atualizar_pontos_sc(tabelas[1])
+        for tabela in tabelas:
+            print(f"Tabela: {tabela}")
+            atualizar_nomes_times(tabela)
+            self.atualizar_pontos(tabela)
+            print(f"Tabela {tabela} atualizada com a rodada {self.rodada}.")
+            self.eliminacao(tabela)
 
     @staticmethod
-    def atualizar_pontos_cc(tabela: str):
+    def atualizar_pontos(tabela: str):
         lista_times = pegar_id_times(tabela)
         for time in lista_times:
-            dados = pegar_pontuacao_cc(time)
+            if tabela == "leliminatoria_ccap":
+                dados = pegar_pontuacao_cc(time)
+            else:
+                dados = pegar_pontuacao_sc(time)
             atualizar_pontuacao_eliminatoria(time, dados["Pontos"], tabela)
 
-    @staticmethod
-    def atualizar_pontos_sc(tabela: str):
-        lista_times = pegar_id_times(tabela)
-        for time in lista_times:
-            dados = pegar_pontuacao_sc(time)
-            atualizar_pontuacao_eliminatoria(time, dados["Pontos"], tabela)
+    def eliminacao(self, tabela: str):
+        eliminar = [
+            {"rodada_inicio": 5, "rodada_final": 10, "num_eliminados": 2}
+        ]
+
+        num_eliminados = 0
+        for esquema in eliminar:
+            if esquema["rodada_inicio"] <= self.rodada <= esquema["rodada_final"]:
+                num_eliminados = esquema["num_eliminados"]
+        if num_eliminados != 0:
+            times = bd_dict_list(tabela, "Pts")
+            times_eliminados = times[-int(num_eliminados):]
+            print("Os seguintes times serão eliminados:")
+            listar_itens(times_eliminados)
+            while True:
+                eliminar = str(input("Confirma?[S/N] ")).strip().upper()
+                if eliminar == "N":
+                    print("Os Times não foram Eliminados.")
+                    break
+                elif eliminar == "S":
+                    con, cursor = acesso_mysql()
+                    for time in times_eliminados:
+                        id = time["ID"]
+                        cursor.execute(f"DELETE FROM {tabela} WHERE ID={id}")
+                        con.commit()
+                        print(f"{time['Nome']} - Cartoleiro: {time['Cartoleiro']} foi Eliminado.")
+                    break
+                else:
+                    print("Opção Inválida.")
+        else:
+            print("Nenhum time será eliminado nessa rodada.")
 
 
 class CadastrarTime:
