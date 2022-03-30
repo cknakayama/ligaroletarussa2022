@@ -39,9 +39,9 @@ def cadastrar_time():
             {'opção': 'Cadastrar times de uma liga'}]
 
     lista_tabelas = [{'opção': 'Liga Principal com Capitão', 'tabela': 'lprincipal_ccap'},
-                     {'opção': 'Liga Principal sem Capitão', 'tabela': 'lprincipal_ccap'},
+                     {'opção': 'Liga Principal sem Capitão', 'tabela': 'lprincipal_scap'},
                      {'opção': 'Liga Eliminatória com Capitão', 'tabela': 'leliminatoria_ccap'},
-                     {'opção': 'Liga Eliminatória sem Capitão', 'tabela': 'leliminatoria_ccap'}]
+                     {'opção': 'Liga Eliminatória sem Capitão', 'tabela': 'leliminatoria_scap'}]
 
     exibir_cabecalho("Cadastro de Times")
     listar_itens(menu)
@@ -50,7 +50,7 @@ def cadastrar_time():
         print("Voltando ao Menu Principal...")
         sleep(2)
         menu_principal()
-    elif escolha_menu == 'Cadastrar time individual':
+    elif escolha_menu["opção"] == 'Cadastrar time individual':
         while True:
             time = pesquisar_time()
             if not time:

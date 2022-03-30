@@ -235,3 +235,5 @@ def atualizar_pontuacao_eliminatoria(id_time: int, pontos: float, tabela: str):
     con, cursor = acesso_mysql()
     cursor.execute(f"UPDATE {tabela} SET {coluna}={pontos} WHERE ID={id_time};")
     con.commit()
+
+
