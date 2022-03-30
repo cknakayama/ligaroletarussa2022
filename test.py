@@ -4,4 +4,3 @@ from roleta_russa import *
 from interface import *
 
 
-cadastrar_time()

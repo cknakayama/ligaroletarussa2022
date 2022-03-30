@@ -1,7 +1,6 @@
 """
 Funcionalidades que acessam a APi do CartolaFC.
 """
-from json import JSONDecodeError
 
 import cartolafc
 from mysqlx import OperationalError
@@ -97,7 +96,7 @@ def pesquisar_liga():
             continuar = str(input('Liga não encontrado. Gostaria de tentar novamente?[S/N] ')).strip().upper()
             if continuar == "N":
                 print("Nenhuma Liga encontrada. Usuário CANCELOU a pesquisa.")
-                sair()
+                terminar_programa()
     for item in ligas:
         temp = {"Nome": item.nome, "Slug": item.slug}
         lista_ligas.append(temp)

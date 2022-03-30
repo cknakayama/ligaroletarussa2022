@@ -2,7 +2,12 @@
 Funções para exibir e interagir com algo no console.
 """
 from os import system
-from interface import sair
+
+
+def terminar_programa():
+    system('cls') or None
+    print('Saindo do Programa')
+    exit()
 
 
 def exibir_cabecalho(texto: str = ''):

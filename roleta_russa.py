@@ -1,7 +1,7 @@
 """
 Programa Principal
 """
-from bd import *
+
 from api import *
 from informativos import *
 from exibir_console import *
@@ -166,5 +166,6 @@ class MataMataLiga:
                         break
                     plan[f'{local["Pts"]}{num}'] = pontos["Pontos"]
                     num += 2
+        print("Pontuação dos confrontos do Mata-mata da Liga foram atualizadas.")
 
 
