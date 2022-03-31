@@ -66,7 +66,7 @@ class Eliminatoria:
             times = bd_dict_list(tabela, "Pts")
             times_eliminados = times[-int(num_eliminados):]
             print("Os seguintes times serão eliminados:")
-            listar_itens(times_eliminados)
+            listar_itens_para_escolha(times_eliminados)
             while True:
                 eliminar = str(input("Confirma?[S/N] ")).strip().upper()
                 if eliminar == "N":

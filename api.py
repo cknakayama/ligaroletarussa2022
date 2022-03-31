@@ -67,7 +67,7 @@ def pesquisar_time():
         for item in times:
             temp = {"ID": item.id, "Nome": item.nome, "Cartoleiro": item.nome_cartola}
             lista_times.append(temp)
-        listar_itens(lista_times)
+        listar_itens_para_escolha(lista_times)
         escolha = escolher_entre_opcoes(lista_times)
         if escolha:
             break
@@ -100,7 +100,7 @@ def pesquisar_liga():
     for item in ligas:
         temp = {"Nome": item.nome, "Slug": item.slug}
         lista_ligas.append(temp)
-    listar_itens(lista_ligas)
+    listar_itens_para_escolha(lista_ligas)
     return escolher_entre_opcoes(lista_ligas)
 
 

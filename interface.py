@@ -21,7 +21,7 @@ def menu_principal():
                     {'opção': 'Novo Mata-mata da Liga'}]
     while True:
         exibir_cabecalho('Menu Principal')
-        listar_itens(menu_inicial)
+        listar_itens_para_escolha(menu_inicial)
         escolha = escolher_entre_opcoes(menu_inicial)
         if not escolha:
             terminar_programa()
@@ -44,7 +44,7 @@ def cadastrar_time():
                      {'opção': 'Liga Eliminatória sem Capitão', 'tabela': 'leliminatoria_scap'}]
 
     exibir_cabecalho("Cadastro de Times")
-    listar_itens(menu)
+    listar_itens_para_escolha(menu)
     escolha_menu = escolher_entre_opcoes(menu)
     if not escolha_menu:
         print("Voltando ao Menu Principal...")
@@ -59,7 +59,7 @@ def cadastrar_time():
                 menu_principal()
             else:
                 print("Onde deseja cadastrar o time?")
-                listar_itens(lista_tabelas)
+                listar_itens_para_escolha(lista_tabelas)
                 escolha_tabela = escolher_varias_opcoes(lista_tabelas)
                 if not escolha_tabela:
                     print("Voltando ao Menu Principal...")
@@ -89,7 +89,7 @@ def cadastrar_time():
             menu_principal()
         else:
             print("Onde deseja cadastrar os times?")
-            listar_itens(lista_tabelas)
+            listar_itens_para_escolha(lista_tabelas)
             escolha_tabela = escolher_entre_opcoes(lista_tabelas)
             if not escolha_tabela:
                 print("Voltando ao Menu Principal...")

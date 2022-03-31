@@ -71,7 +71,7 @@ def nomes_colunas(tabela: str):
     return colunas
 
 
-def bd_dict_list(tabela: str, coluna: str):
+def bd_dict_list(tabela: str, coluna: str, crescente=False):
     """
             Pega os dados de cada linha da tabela especificada e transforma em dicionários.
 
@@ -83,14 +83,18 @@ def bd_dict_list(tabela: str, coluna: str):
         for c in colunas:
             lista_colunas.append({f"Coluna": c})
         exibir_cabecalho("Escolha como deseja ordenar os dados:")
-        listar_itens(lista_colunas)
+        listar_itens_para_escolha(lista_colunas)
         escolha = escolher_entre_opcoes(lista_colunas)
         coluna_ordem = escolha["Coluna"]
     else:
         coluna_ordem = coluna
+    if crescente:
+        ordem = "ASC"
+    else:
+        ordem = "DESC"
     lista_dados = []
     con, cursor = acesso_mysql()
-    cursor.execute(f"SELECT * FROM {tabela} ORDER BY {coluna_ordem} DESC;")
+    cursor.execute(f"SELECT * FROM {tabela} ORDER BY {coluna_ordem} {ordem};")
     for linha in cursor.fetchall():
         dicionario_temp = {}
         contador = 0
@@ -236,4 +240,53 @@ def atualizar_pontuacao_eliminatoria(id_time: int, pontos: float, tabela: str):
     cursor.execute(f"UPDATE {tabela} SET {coluna}={pontos} WHERE ID={id_time};")
     con.commit()
 
+
+def juntar_times_cadastrados():
+    tabelas = ["lprincipal_ccap", "lprincipal_scap",
+               "leliminatoria_ccap", "leliminatoria_scap",
+               "mmliga_ccap", "mmliga_scap"]
+
+    for tabela in tabelas:
+        times = bd_dict_list(tabela, "ID")
+        for time in times:
+            salvar_time_bd(time, "times_cadastrados")
+
+
+def pesquisar_em_times_cadastrados():
+    termo_pesquisa = str(input("Pesquisa: "))
+    con, cursor = acesso_mysql()
+    cursor.execute(f"SELECT * FROM times_cadastrados WHERE Nome LIKE '%{termo_pesquisa}%'")
+    times = []
+    for dado in cursor.fetchall():
+        times.append({"ID": dado[0], "Nome": dado[1], "Cartoleiro": dado[2]})
+    listar_itens_para_escolha(times)
+    return escolher_entre_opcoes(times)
+
+
+def listar_times_em_tabela(tabela: str):
+    times = bd_dict_list(tabela, "Nome", crescente=True)
+    lista = []
+    for time in times:
+        lista.append({"ID": time["ID"], "Nome": time["Nome"], "Cartoleiro": time["Cartoleiro"]})
+    exibir_cabecalho(f"Tabela {tabela} - Times Cadastrados")
+    listar_itens(lista)
+
+
+def listar_tabelas_do_time(time: dict):
+    tabelas = ["lprincipal_ccap", "lprincipal_scap",
+               "leliminatoria_ccap", "leliminatoria_scap",
+               "mmliga_ccap", "mmliga_scap"]
+
+    exibir_cabecalho(f"Pesquisar por time {time['Nome']} no banco de dados")
+    con, cursor = acesso_mysql()
+    lista_tabelas = []
+    for tabela in tabelas:
+        cursor.execute(f"SELECT * FROM {tabela} WHERE ID={time['ID']}")
+        if cursor.fetchall():
+            lista_tabelas.append({"ID": time['ID'], "Nome": time['Nome'],
+                                  "Cartoleiro": time['Cartoleiro'], "Tabela": tabela})
+    if lista_tabelas:
+        listar_itens(lista_tabelas)
+    else:
+        print("Time não encontrado no banco de dados.")
 

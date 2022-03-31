@@ -45,6 +45,16 @@ def listar_itens(lista: list):
             print(f" {dic[chaves[c]]:<{maiores[c] + 2}} ", end="")
         print()
         numero += 1
+
+
+def listar_itens_para_escolha(lista: list):
+    """
+    Método que exibe na tela uma lista tabelada das opções + opção nula.
+
+    Recebe:     lista - uma lista de dicionários contendo as opções.
+                As chaves serão os cabeçalhos da tabela.
+    """
+    listar_itens(lista)
     print(f" {'0':^4}  Nenhuma das alternativas")
 
 
@@ -116,7 +126,7 @@ def escolher_varias_opcoes(lista: list):
                 print("Digite pelo menos uma opção válida.")
             else:
                 exibir_cabecalho("Opções escolhidas")
-                listar_itens(escolhas)
+                listar_itens_para_escolha(escolhas)
                 continuar = str(input("Confirma?[S/N] ")).strip().upper()
                 if continuar == "S":
                     return escolhas

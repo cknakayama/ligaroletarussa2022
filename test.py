@@ -1,6 +1,6 @@
 from bd import *
-from api import *
-from roleta_russa import *
-from interface import *
+
+
+listar_times_em_tabela('lprincipal_ccap')
 
 
