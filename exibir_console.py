@@ -87,7 +87,7 @@ def escolher_entre_opcoes(dicionario: list):
             return {}
         elif 0 < escolha <= len(dicionario):
             try:
-                opcao = dicionario[escolha -1]
+                opcao = dicionario[escolha - 1]
             except IndexError:
                 print('Opção inválida.')
             else:

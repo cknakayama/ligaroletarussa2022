@@ -41,7 +41,7 @@ def cadastrar_time():
     lista_tabelas = [{'opção': 'Liga Principal com Capitão', 'tabela': 'lprincipal_ccap'},
                      {'opção': 'Liga Principal sem Capitão', 'tabela': 'lprincipal_scap'},
                      {'opção': 'Liga Eliminatória com Capitão', 'tabela': 'leliminatoria_ccap'},
-                     {'opção': 'Liga Eliminatória sem Capitão', 'tabela': 'leliminatoria_scap'}]
+                     {'opção': 'Liga Eliminatória sem Capitão', 'tabela': 'leliminatoria_s1cap'}]
 
     exibir_cabecalho("Cadastro de Times")
     listar_itens_para_escolha(menu)
@@ -96,8 +96,9 @@ def cadastrar_time():
                 sleep(2)
                 menu_principal()
             else:
+                tabela = [escolha_tabela['tabela']]
                 for time in times:
-                    CadastrarTime(time, escolha_tabela['tabela'])
+                    CadastrarTime(time, tabela)
                     print(f"Time {time['Nome']} Cadastrado na tabela {escolha_tabela['tabela']}")
         print("Voltando ao Menu Principal...")
         sleep(2)
