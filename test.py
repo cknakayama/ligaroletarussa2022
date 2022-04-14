@@ -1,11 +1,15 @@
 from bd import *
 from api import *
 from roleta_russa import *
+from informativos import *
 
 
-slugs = ["roleta-ru-a", "roleta-russa-a-liga"]
+#informativos_top10()
+#informativos_patrimonio()
+#informativos_mito()
+#informativos_turno()
+#informativos_mensal(4)
+#informativos_eliminatoria()
+mes = verificar_mes()
 
-times = times_liga(slugs[0])
-for time in times:
-    CadastrarTime(time, "lprincipal_ccap")
 

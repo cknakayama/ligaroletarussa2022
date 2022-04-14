@@ -145,14 +145,21 @@ def pegar_pontuacao_cc(id_time: int):
     try:
         t = api.time(id=id_time, as_json=True)
     except cartolafc.CartolaFCError:
-        t = {'pontos': 0, 'patrimonio': 0}
-    return {'ID': id_time, 'Pontos': t['pontos'], 'Patrimonio': t['patrimonio']}
+        return {'ID': id_time, 'Pontos': 0, 'Patrimonio': 0}
+    else:
+        if not t['pontos']:
+            t['pontos'] = 0
+        return {'ID': id_time, 'Pontos': t['pontos'], 'Patrimonio': t['patrimonio']}
 
 
 def pegar_pontuacao_sc(id_time: int):
     api = api_login()
-    time = api.time(id=id_time, as_json=True)
-    pontos = 0
-    for jogadores in time['atletas']:
-        pontos += jogadores['pontos_num']
-    return {'ID': id_time, 'Pontos': pontos, 'Patrimonio': time['patrimonio']}
+    try:
+        time = api.time(id=id_time, as_json=True)
+    except cartolafc.CartolaFCError:
+        return {'ID': id_time, 'Pontos': 0, 'Patrimonio': 0}
+    else:
+        pontos = 0
+        for jogadores in time['atletas']:
+            pontos += jogadores['pontos_num']
+        return {'ID': id_time, 'Pontos': pontos, 'Patrimonio': time['patrimonio']}

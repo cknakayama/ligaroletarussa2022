@@ -36,12 +36,13 @@ def menu_principal():
 def cadastrar_time():
     os.system('cls' if os.name == 'nt' else 'clear')
     menu = [{'opção': 'Cadastrar time individual'},
-            {'opção': 'Cadastrar times de uma liga'}]
+            {'opção': 'Cadastrar times de uma liga'},
+            {'opção': 'Cadastrar times cadastrado em uma liga'}]
 
     lista_tabelas = [{'opção': 'Liga Principal com Capitão', 'tabela': 'lprincipal_ccap'},
                      {'opção': 'Liga Principal sem Capitão', 'tabela': 'lprincipal_scap'},
                      {'opção': 'Liga Eliminatória com Capitão', 'tabela': 'leliminatoria_ccap'},
-                     {'opção': 'Liga Eliminatória sem Capitão', 'tabela': 'leliminatoria_s1cap'}]
+                     {'opção': 'Liga Eliminatória sem Capitão', 'tabela': 'leliminatoria_scap'}]
 
     exibir_cabecalho("Cadastro de Times")
     listar_itens_para_escolha(menu)
@@ -79,6 +80,11 @@ def cadastrar_time():
                 continue
             else:
                 print("Opção inválida!")
+    elif escolha_menu["opção"] == 'Cadastrar times cadastrado em uma liga':
+        cadastrar_times_na_liga()
+        print("Voltando ao Menu Principal...")
+        sleep(2)
+        menu_principal()
     else:
         liga = pesquisar_liga()
         times = times_liga(liga['Slug'])
@@ -140,6 +146,32 @@ def matamata_liga():
             menu_principal()
         else:
             print("Opção inválida!")
+
+
+def cadastrar_times_na_liga():
+    lista_tabelas = [{'opção': 'Liga Principal com Capitão', 'tabela': 'lprincipal_ccap'},
+                     {'opção': 'Liga Principal sem Capitão', 'tabela': 'lprincipal_scap'},
+                     {'opção': 'Liga Eliminatória com Capitão', 'tabela': 'leliminatoria_ccap'},
+                     {'opção': 'Liga Eliminatória sem Capitão', 'tabela': 'leliminatoria_scap'},
+                     {'opção': 'Mata-Mata Avulso', 'tabela': 'mmavulso'}]
+
+    while True:
+        os.system('cls' if os.name == 'nt' else 'clear')
+        exibir_cabecalho("Cadastrar times em uma Liga")
+        print("Escolher na lista de cadastro os times para inserir na liga.")
+        print("Escolha em qual liga deseja cadastrar o(s) time(s):")
+        listar_itens_para_escolha(lista_tabelas)
+        escolha_tabela = escolher_varias_opcoes(lista_tabelas)
+        times = bd_dict_list("times_cadastrados", coluna="Nome", crescente=True)
+        for tabela in escolha_tabela:
+            for time in times:
+                os.system('cls' if os.name == 'nt' else 'clear')
+                exibir_cabecalho("Cadastrar times em uma Liga")
+                exibir_cabecalho(f"Tabela: {tabela['opção']}")
+                print(f"{time['ID']}  -  {time['Nome']}  -  {time['Cartoleiro']}")
+                escolha = str(input("Deseja cadastrar o time?[S/N] ")).strip().upper()
+                if escolha == "S":
+                    CadastrarTime(time, [tabela['tabela']])
 
 
 menu_principal()

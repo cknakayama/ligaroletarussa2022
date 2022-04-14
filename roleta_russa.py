@@ -18,17 +18,24 @@ class Principal:
             print(f"Tabela {tabela} atualizada com a rodada {self.rodada}.")
 
     def atualizar_pontos(self, tabela: str):
+        print(f"Atualizando tabela {tabela}")
         lista_times = pegar_id_times(tabela)
         for time in lista_times:
             if tabela == "lprincipal_ccap":
                 dados = pegar_pontuacao_cc(time)
             else:
                 dados = pegar_pontuacao_sc(time)
+#            print(f"Pontuação do time {time} foi acessada.")
             atualizar_pontuacao_rodada(time, self.rodada, dados["Pontos"], tabela)
+#            print(f"Pontuação do time {time} atualizada.")
             atualizar_patrimonio(time, dados["Patrimonio"], tabela)
+#            print(f"Patrimonio do time {time} atualizada.")
             atualizar_pts_total(time, dados["Pontos"], tabela)
+#            print(f"Pts_total do time {time} atualizada.")
             atualizar_mito(time, self.rodada, dados["Pontos"], tabela)
+#            print(f"Mito do time {time} atualizada.")
             atualizar_turno_returno(time, self.rodada, dados["Pontos"], tabela)
+#            print(f"Turno do time {time} atualizada.")
         atualizar_mensal(tabela, self.rodada)
 
 

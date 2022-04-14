@@ -147,8 +147,6 @@ def atualizar_pontuacao_rodada(id_time: int, rodada: int, pontos: float, tabela:
         cursor.execute(f"ALTER TABLE {tabela} ADD {coluna} double;")
         con.commit()
         print(f"Coluna {coluna} criada com sucesso.")
-    else:
-        print(f"Coluna {coluna} já existe.")
     cursor.execute(f"UPDATE {tabela} SET {coluna}={pontos} WHERE ID={id_time};")
     con.commit()
 
