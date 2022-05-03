@@ -48,7 +48,8 @@ class Eliminatoria:
             atualizar_nomes_times(tabela)
             self.atualizar_pontos(tabela)
             print(f"Tabela {tabela} atualizada com a rodada {self.rodada}.")
-            self.eliminacao(tabela)
+        self.eliminacao_cc("leliminatoria_ccap")
+        self.eliminacao_sc("leliminatoria_scap")
 
     @staticmethod
     def atualizar_pontos(tabela: str):
@@ -60,9 +61,9 @@ class Eliminatoria:
                 dados = pegar_pontuacao_sc(time)
             atualizar_pontuacao_eliminatoria(time, dados["Pontos"], tabela)
 
-    def eliminacao(self, tabela: str):
+    def eliminacao_cc(self, tabela: str):
         eliminar = [
-            {"rodada_inicio": 5, "rodada_final": 10, "num_eliminados": 2}
+            {"rodada_inicio": 8, "rodada_final": 37, "num_eliminados": 1}
         ]
 
         num_eliminados = 0
@@ -90,7 +91,39 @@ class Eliminatoria:
                 else:
                     print("Opção Inválida.")
         else:
-            print("Nenhum time será eliminado nessa rodada.")
+            print(f"Nenhum time será eliminado nessa rodada na {tabela}.")
+
+    def eliminacao_sc(self, tabela: str):
+        eliminar = [
+            {"rodada_inicio": 13, "rodada_final": 37, "num_eliminados": 1}
+        ]
+
+        num_eliminados = 0
+        for esquema in eliminar:
+            if esquema["rodada_inicio"] <= self.rodada <= esquema["rodada_final"]:
+                num_eliminados = esquema["num_eliminados"]
+        if num_eliminados != 0:
+            times = bd_dict_list(tabela, "Pts")
+            times_eliminados = times[-int(num_eliminados):]
+            print("Os seguintes times serão eliminados:")
+            listar_itens_para_escolha(times_eliminados)
+            while True:
+                eliminar = str(input("Confirma?[S/N] ")).strip().upper()
+                if eliminar == "N":
+                    print("Os Times não foram Eliminados.")
+                    break
+                elif eliminar == "S":
+                    con, cursor = acesso_mysql()
+                    for time in times_eliminados:
+                        id = time["ID"]
+                        cursor.execute(f"DELETE FROM {tabela} WHERE ID={id}")
+                        con.commit()
+                        print(f"{time['Nome']} - Cartoleiro: {time['Cartoleiro']} foi Eliminado.")
+                    break
+                else:
+                    print("Opção Inválida.")
+        else:
+            print(f"Nenhum time será eliminado nessa rodada na {tabela}.")
 
 
 class CadastrarTime:
